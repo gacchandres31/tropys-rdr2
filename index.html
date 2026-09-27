@@ -12,7 +12,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background: #1a1a1a;
+            background: #1a1412; /* Color de fondo acorde al estilo del juego */
         }
     </style>
 </head>
@@ -23,35 +23,36 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Sistema de coordenadas planas para mapas de videojuegos
+        // Configuración de coordenadas planas para el mapa de RDR2
         var map = L.map('map', {
             crs: L.CRS.Simple,
-            minZoom: 0,
-            maxZoom: 5,
+            minZoom: 2,
+            maxZoom: 6,
             zoomControl: false
         });
 
+        // Controles de zoom abajo a la derecha
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Dimensiones del mapa de RDR2 adaptadas para tiles estándar
-        var bounds = [[0, 0], [8192, 8192]];
+        // Límites del mapa del mundo de RDR2
+        var bounds = [[0, 0], [6144, 8192]];
         map.setMaxBounds(bounds);
 
-        // Cargamos los tiles oficiales del mapa de RDR2 adaptados para Leaflet
-        L.tileLayer('https://s.rsg.sc/sc/images/games/RDR2/map/game/{z}/{x}/{y}.jpg', {
-            minZoom: 0,
+        // Capa de tiles clásica del mapa de RDR2
+        L.tileLayer('https://raw.githubusercontent.com/adamui/rdr2-map-tiles/master/tiles/{z}/{x}/{y}.jpg', {
+            minZoom: 2,
             maxZoom: 5,
             noWrap: true,
             bounds: bounds,
-            attribution: 'Rockstar Games'
+            attribution: 'RDR2 Interactive Map'
         }).addTo(map);
 
-        // Vista inicial centrada
-        map.setView([4096, 4096], 2);
+        // Centrar en una zona principal (ej. Heartlands / Valentine)
+        map.setView([3000, 4000], 3);
 
-        // Marcador de prueba
-        L.marker([4096, 4096]).addTo(map)
-            .bindPopup('<b>¡Mapa de RDR2 activo!</b>');
+        // Marcador de prueba inicial
+        L.marker([3000, 4000]).addTo(map)
+            .bindPopup('<b>¡Tropys RDR2!</b><br>Mapa interactivo activo.');
     </script>
 </body>
 </html>
