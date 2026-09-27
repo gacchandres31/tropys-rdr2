@@ -3,117 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>RDR2MapApp - Mapa Interactivo</title>
-    
+    <title>RDR2 Map - Tropys</title>
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body, html {
+        html, body, #map {
+            width: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #111;
-            font-family: sans-serif;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
             background: #1a1a1a;
-        }
-        /* Estilo para el panel flotante de filtros o info */
-        .info-panel {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #444;
         }
     </style>
 </head>
 <body>
 
-    <div class="info-panel">
-        <h3 style="margin: 0 0 5px 0; font-size: 14px; color: #d4af37;">RDR2 Map App</h3>
-        <p style="margin: 0; font-size: 11px;">Ciclo Diario: <span id="ciclo-texto">Calculando...</span></p>
-    </div>
-
     <div id="map"></div>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. Inicializar el mapa con coordenadas planas (CRS.Simple para juegos)
-        const map = L.map('map', {
+        // Configuración del mapa usando coordenadas CRS.Simple ideales para mapas de videojuegos
+        var map = L.map('map', {
             crs: L.CRS.Simple,
             minZoom: 2,
             maxZoom: 6,
-            zoomControl: false // Quitamos los botones por defecto para que se vea más limpio en móvil
+            zoomControl: false // Quitamos los controles por defecto para hacerlo más limpio en móvil
         });
 
-        // Centramos el mapa provisionalmente
-        map.setView([0, 0], 3);
+        // Agregamos controles de zoom personalizados en una esquina cómoda
+        L.control.zoom({ position: 'bottomright' }).addT(map);
 
-        // 2. Cálculo automático del ciclo diario (Rotación de coleccionables)
-        function obtenerCicloActual() {
-            const fechaInicio = new Date('2026-01-01');
-            const hoy = new Date();
-            const diferenciaDias = Math.floor((hoy - fechaInicio) / (1000 * 60 * 60 * 24));
-            return (diferenciaDias % 3) + 1; // Devuelve 1, 2 o 3
-        }
+        // Límites del mapa de RDR2 en coordenadas personalizadas
+        var bounds = [[0, 0], [8500, 10000]];
+        map.setMaxBounds(bounds);
 
-        const cicloActual = obtenerCicloActual();
-        document.getElementById('ciclo-texto').innerText = "Ciclo " + cicloActual;
+        // Usamos una capa base provisional optimizada para mapas de juegos (o tiles base estándar oscuros)
+        // Nota: Aquí puedes apuntar a los tiles del mapa oficial de RDR2 o una capa base limpia
+        var mapLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 6,
+            minZoom: 2,
+            noWrap: true,
+            bounds: bounds,
+            attribution: '&copy; RDR2 Tropys Map'
+        }).addTo(map);
 
-        // 3. Simulación de datos (Aquí cargarás tus JSON con los coleccionables reales)
-        // Coordenadas simuladas de ejemplo en el mapa
-        const coleccionablesEjemplo = [
-            { id: "item_1", name: "Carta de Tarot: As de Bastos", lat: -20, lng: 30, ciclo: 1 },
-            { id: "item_2", name: "Flor: Aguileña Silvestre", lat: -45, lng: 60, ciclo: 1 },
-            { id: "item_3", name: "Moneda de Oro Antigua", lat: -10, lng: -40, ciclo: 2 }
-        ];
+        // Centramos la vista inicial en el corazón de Valentine / Lemoyne
+        map.setView([4000, 5000], 3);
 
-        // 4. Filtrar y pintar los marcadores según el ciclo de hoy
-        coleccionablesEjemplo.forEach(item => {
-            // Verificamos si pertenece al ciclo de hoy (o puedes mostrarlos todos)
-            if (item.ciclo === cicloActual || true) { 
-                
-                // Revisar si el usuario ya lo marcó como recolectado antes
-                const estaGuardado = localStorage.getItem(item.id) === 'true';
-                const colorActual = estaGuardado ? '#555' : '#d4af37'; // Dorado si está pendiente, gris si está hecho
+        // Ejemplo de marcador de prueba en el mapa real
+        var marker = L.marker([4000, 5000]).addTo(map)
+            .bindPopup('<b>¡Aquí estamos!</b><br>Valentine, Heartlands.');
 
-                // Crear el marcador en el mapa
-                const marker = L.circleMarker([item.lat, item.lng], {
-                    radius: 10,
-                    color: '#000',
-                    weight: 2,
-                    fillColor: colorActual,
-                    fillOpacity: 0.9
-                }).addTo(map);
-
-                // Texto al tocar el marcador
-                marker.bindPopup(`<b>${item.name}</b><br><span style="font-size:10px;">Toca para marcar como hecho</span>`);
-
-                // Interactividad: Guardar estado al hacer clic
-                marker.on('click', function() {
-                    const estadoPrevio = localStorage.getItem(item.id) === 'true';
-                    const nuevoEstado = !estadoPrevio;
-                    
-                    localStorage.setItem(item.id, nuevoEstado);
-
-                    // Cambiar color al instante
-                    marker.setStyle({
-                        fillColor: nuevoEstado ? '#555' : '#d4af37'
-                    });
-                });
-            }
-        });
     </script>
 </body>
 </html>
