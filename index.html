@@ -12,7 +12,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background: #1a1412; /* Color de fondo acorde al estilo del juego */
+            background: #1a1412;
         }
     </style>
 </head>
@@ -23,36 +23,33 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Configuración de coordenadas planas para el mapa de RDR2
+        // Configuración de coordenadas planas para el mapa del juego
         var map = L.map('map', {
             crs: L.CRS.Simple,
-            minZoom: 2,
-            maxZoom: 6,
+            minZoom: -1,
+            maxZoom: 3,
             zoomControl: false
         });
 
         // Controles de zoom abajo a la derecha
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Límites del mapa del mundo de RDR2
-        var bounds = [[0, 0], [6144, 8192]];
-        map.setMaxBounds(bounds);
+        // Dimensiones de la imagen del mapa
+        var bounds = [[0, 0], [4096, 4096]];
 
-        // Capa de tiles clásica del mapa de RDR2
-        L.tileLayer('https://raw.githubusercontent.com/adamui/rdr2-map-tiles/master/tiles/{z}/{x}/{y}.jpg', {
-            minZoom: 2,
-            maxZoom: 5,
-            noWrap: true,
-            bounds: bounds,
-            attribution: 'RDR2 Interactive Map'
-        }).addTo(map);
+        // Usamos una URL directa y estable de la imagen del mapa completo de RDR2
+        var imageUrl = 'https://images.igdb.com/igdb/image/upload/t_original/grm4w6.jpg';
 
-        // Centrar en una zona principal (ej. Heartlands / Valentine)
-        map.setView([3000, 4000], 3);
+        // Añadimos la imagen como una capa interactiva en el mapa
+        L.imageOverlay(imageUrl, bounds).addTo(map);
 
-        // Marcador de prueba inicial
-        L.marker([3000, 4000]).addTo(map)
-            .bindPopup('<b>¡Tropys RDR2!</b><br>Mapa interactivo activo.');
+        // Ajustamos los límites y la vista inicial al centro del mapa
+        map.setMaxBounds([[-1000, -1000], [5096, 5096]]);
+        map.setView([2048, 2048], 0);
+
+        // Marcador de prueba en Valentine / zona central
+        L.marker([2048, 2048]).addTo(map)
+            .bindPopup('<b>¡Tropys RDR2 Map!</b><br>¡Mapa cargado con éxito!');
     </script>
 </body>
 </html>
