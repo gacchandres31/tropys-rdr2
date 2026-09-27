@@ -23,38 +23,35 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Configuración del mapa usando coordenadas CRS.Simple ideales para mapas de videojuegos
+        // Sistema de coordenadas planas para mapas de videojuegos
         var map = L.map('map', {
             crs: L.CRS.Simple,
-            minZoom: 2,
-            maxZoom: 6,
-            zoomControl: false // Quitamos los controles por defecto para hacerlo más limpio en móvil
+            minZoom: 0,
+            maxZoom: 5,
+            zoomControl: false
         });
 
-        // Agregamos controles de zoom personalizados en una esquina cómoda
-        L.control.zoom({ position: 'bottomright' }).addT(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Límites del mapa de RDR2 en coordenadas personalizadas
-        var bounds = [[0, 0], [8500, 10000]];
+        // Dimensiones del mapa de RDR2 adaptadas para tiles estándar
+        var bounds = [[0, 0], [8192, 8192]];
         map.setMaxBounds(bounds);
 
-        // Usamos una capa base provisional optimizada para mapas de juegos (o tiles base estándar oscuros)
-        // Nota: Aquí puedes apuntar a los tiles del mapa oficial de RDR2 o una capa base limpia
-        var mapLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 6,
-            minZoom: 2,
+        // Cargamos los tiles oficiales del mapa de RDR2 adaptados para Leaflet
+        L.tileLayer('https://s.rsg.sc/sc/images/games/RDR2/map/game/{z}/{x}/{y}.jpg', {
+            minZoom: 0,
+            maxZoom: 5,
             noWrap: true,
             bounds: bounds,
-            attribution: '&copy; RDR2 Tropys Map'
+            attribution: 'Rockstar Games'
         }).addTo(map);
 
-        // Centramos la vista inicial en el corazón de Valentine / Lemoyne
-        map.setView([4000, 5000], 3);
+        // Vista inicial centrada
+        map.setView([4096, 4096], 2);
 
-        // Ejemplo de marcador de prueba en el mapa real
-        var marker = L.marker([4000, 5000]).addTo(map)
-            .bindPopup('<b>¡Aquí estamos!</b><br>Valentine, Heartlands.');
-
+        // Marcador de prueba
+        L.marker([4096, 4096]).addTo(map)
+            .bindPopup('<b>¡Mapa de RDR2 activo!</b>');
     </script>
 </body>
 </html>
